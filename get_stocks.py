@@ -120,6 +120,7 @@ def prompt_for_input(results_arr):
     
 def download_data(stock_symbol):
     global SYMBOL
+    #stock_symbol=stock_symbol.replace('-EQ.','.')
     if (not os.path.isfile(stock_symbol+'.csv')):
         browser = RoboBrowser(history=True,
                               parser='lxml',
@@ -144,6 +145,7 @@ def download_data(stock_symbol):
            return stock_symbol
         else:
            print ('CSV file for %s not found' % stock_symbol)
+           return stock_symbol
     else:
         print ('Local CSV file for %s found' % stock_symbol)
         return stock_symbol

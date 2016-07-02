@@ -6,6 +6,8 @@ import matplotlib.dates as mdates
 from matplotlib import style
 import datetime as dt
 import numpy as np
+import sys
+import os
 
 def bytesupdate2num(fmt, encoding='utf-8'):
     strconverter = mdates.strpdate2num(fmt)
@@ -15,14 +17,18 @@ def bytesupdate2num(fmt, encoding='utf-8'):
     return bytesconverter
 
 def read_csv(file_name):
-    print ('Reading %s' % file_name)
-    date, openp, highp, lowp, closep, volume, adjclosep = np.loadtxt(file_name, 
+    if (os.path.isfile(file_name)):
+        print ('Reading %s' % file_name)
+        date, openp, highp, lowp, closep, volume, adjclosep = np.loadtxt(file_name, 
                                                                     delimiter=',', 
                                                                     unpack=True,
                                                                     converters={0:bytesupdate2num('%Y-%m-%d')},
                                                                     skiprows=1
                                                                     )
-    return date, openp, highp, lowp, closep, volume, adjclosep
+        return date, openp, highp, lowp, closep, volume, adjclosep
+    else:
+        print('No data found ... Exiting')
+        sys.exit()
 
 def plot_data(symbol, date, openp, highp, lowp, closep, volume, adjclosep):
     style.use('ggplot')
