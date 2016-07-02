@@ -39,13 +39,15 @@ def parse_args():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-t', '--searchterm', help='Search term')
+    parser.add_argument('searchterm', help='Search term')
     parser.add_argument('-a', '--all', help='Get all indices',  action="store_true", default=False)
     parser.add_argument('-n', '--nse', help='Get only NSE indices',  action="store_true", default=False)
     parser.add_argument('-b', '--bse', help='Get only BSE indices',  action="store_true", default=False)
-    parser.add_argument('-s', '--symbol', help='Download csv file with specified symbol')
+    parser.add_argument('-s', '--symbol', help='Download csv file with specified symbol', action='store_true', default=False)
 
     args = parser.parse_args()
+
+    search_term=args.searchterm.upper()
 
     if args.all:
         ALL=True
@@ -54,9 +56,7 @@ def parse_args():
     if args.bse:
         BSE=True
     if args.symbol:
-        SYMBOL=args.symbol.upper()
-    if args.searchterm:
-        search_term = args.searchterm.upper()
+        SYMBOL=search_term
 
     return search_term
 
@@ -140,7 +140,8 @@ def download_data(stock_symbol):
         elif SYMBOL:
            SYMBOL=''
            print ('CSV file for %s not found' % stock_symbol)
-           get_table(stock_symbol)
+           stock_symbol=get_table(stock_symbol)
+           return stock_symbol
         else:
            print ('CSV file for %s not found' % stock_symbol)
     else:
@@ -171,6 +172,7 @@ def get_table(search_term):
         pretty_print (results_arr)
         stock_symbol = prompt_for_input(results_arr)
         stock_symbol=download_data(stock_symbol)
+        return stock_symbol
     else:
         print ('Data for %s not found' % search_term)
         sys.exit()
@@ -181,9 +183,10 @@ def get_going():
     search_term=parse_args()
     if SYMBOL:
         stock_symbol=download_data(SYMBOL)
+        return stock_symbol
     else:
         stock_symbol=get_table(search_term)
-    return stock_symbol
+        return stock_symbol
 
 if __name__=='__main__':
     get_going()
