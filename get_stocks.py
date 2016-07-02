@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument('-a', '--all', help='Get all indices',  action="store_true", default=False)
     parser.add_argument('-n', '--nse', help='Get only NSE indices',  action="store_true", default=False)
     parser.add_argument('-b', '--bse', help='Get only BSE indices',  action="store_true", default=False)
-    parser.add_argument('-s', '--symbol', help='Download csv file with specified symbol', action='store_true', default=False)
+    parser.add_argument('-s', '--symbol', help='Consider search term as a symbol', action='store_true', default=False)
 
     args = parser.parse_args()
 
