@@ -7,6 +7,7 @@ from terminaltables import AsciiTable
 import datetime
 import re
 import sys
+import os
 
 global USER_AGENT
 global URL
@@ -119,28 +120,32 @@ def prompt_for_input(results_arr):
     
 def download_data(stock_symbol):
     global SYMBOL
-    browser = RoboBrowser(history=True,
-                          parser='lxml',
-                          user_agent=USER_AGENT)
-    now = datetime.datetime.now()
-    current_year = now.year
-    old_year = current_year - 20
-    current_year = str(current_year)
-    old_year = str(old_year)
-    csv_url='http://real-chart.finance.yahoo.com/table.csv?s='+stock_symbol+'&d=6&e=2&f='+current_year+'&g=d&a=0&b=1&c='+old_year+'&ignore=.csv'
-    file_name=stock_symbol+'.csv'
-    request = browser.session.get(csv_url, stream=True)
-    if re.search('.*csv.*',request.headers['Content-Type']):
-        print ('Downloading %s.csv' % stock_symbol)
-        with open(file_name, "wb") as csv_file:
-            csv_file.write(request.content)
-        return stock_symbol
-    elif SYMBOL:
-       SYMBOL=''
-       print ('CSV file for %s not found' % stock_symbol)
-       get_table(stock_symbol)
+    if (not os.path.isfile(stock_symbol+'.csv')):
+        browser = RoboBrowser(history=True,
+                              parser='lxml',
+                              user_agent=USER_AGENT)
+        now = datetime.datetime.now()
+        current_year = now.year
+        old_year = current_year - 20
+        current_year = str(current_year)
+        old_year = str(old_year)
+        csv_url='http://real-chart.finance.yahoo.com/table.csv?s='+stock_symbol+'&d=6&e=2&f='+current_year+'&g=d&a=0&b=1&c='+old_year+'&ignore=.csv'
+        file_name=stock_symbol+'.csv'
+        request = browser.session.get(csv_url, stream=True)
+        if re.search('.*csv.*',request.headers['Content-Type']):
+            print ('Downloading %s.csv' % stock_symbol)
+            with open(file_name, "wb") as csv_file:
+                csv_file.write(request.content)
+            return stock_symbol
+        elif SYMBOL:
+           SYMBOL=''
+           print ('CSV file for %s not found' % stock_symbol)
+           get_table(stock_symbol)
+        else:
+           print ('CSV file for %s not found' % stock_symbol)
     else:
-       print ('CSV file for %s not found' % stock_symbol)
+        print ('Local CSV file for %s found' % stock_symbol)
+        return stock_symbol
 
 def get_table(search_term):
     print('Searching for %s' % search_term)
@@ -165,16 +170,20 @@ def get_table(search_term):
     if (len(results_arr)>1):
         pretty_print (results_arr)
         stock_symbol = prompt_for_input(results_arr)
-        download_data(stock_symbol)
+        stock_symbol=download_data(stock_symbol)
     else:
         print ('Data for %s not found' % search_term)
         sys.exit()
     return stock_symbol
 
-if __name__=='__main__':
+def get_going():
     set_user_agent()
     search_term=parse_args()
     if SYMBOL:
-        download_data(SYMBOL)
+        stock_symbol=download_data(SYMBOL)
     else:
-        get_table(search_term)
+        stock_symbol=get_table(search_term)
+    return stock_symbol
+
+if __name__=='__main__':
+    get_going()
